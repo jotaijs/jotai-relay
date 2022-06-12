@@ -1,0 +1,94 @@
+{
+  "name": "jotai-relay",
+  "description": "👻🧲",
+  "version": "0.0.1",
+  "author": "Daishi Kato",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jotai-labs/jotai-relay.git"
+  },
+  "source": "./src/index.ts",
+  "main": "./dist/index.umd.js",
+  "module": "./dist/index.modern.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "module": "./dist/index.modern.js",
+      "import": "./dist/index.modern.mjs",
+      "default": "./dist/index.umd.js"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "compile": "microbundle build -f modern,umd --globals react=React",
+    "postcompile": "cp dist/index.modern.js dist/index.modern.mjs && cp dist/index.modern.js.map dist/index.modern.mjs.map",
+    "test": "run-s eslint tsc-test jest",
+    "eslint": "eslint --ext .js,.ts,.tsx .",
+    "jest": "jest",
+    "tsc-test": "tsc --project . --noEmit",
+    "relay:01_minimal": "relay-compiler ./examples/01_minimal/relay.config.js",
+    "relay:02_typescript": "relay-compiler ./examples/02_typescript/relay.config.js",
+    "examples:01_minimal": "DIR=01_minimal EXT=js webpack serve",
+    "examples:02_typescript": "DIR=02_typescript EXT=tsx webpack serve"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "preset": "ts-jest/presets/js-with-ts"
+  },
+  "keywords": [
+    "jotai",
+    "react",
+    "relay"
+  ],
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/preset-env": "^7.18.2",
+    "@babel/preset-react": "^7.17.12",
+    "@babel/preset-typescript": "^7.17.12",
+    "@types/jest": "^28.1.1",
+    "@types/react": "^18.0.12",
+    "@types/react-dom": "^18.0.5",
+    "@types/relay-runtime": "^13.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.27.1",
+    "@typescript-eslint/parser": "^5.27.1",
+    "babel-loader": "^8.2.5",
+    "babel-plugin-macros": "^3.1.0",
+    "babel-plugin-relay": "^14.0.0",
+    "eslint": "^8.17.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.30.0",
+    "graphql": "^16.5.0",
+    "html-webpack-plugin": "^5.5.0",
+    "jest": "^28.1.1",
+    "jest-environment-jsdom": "^28.1.1",
+    "jotai": "^1.7.2",
+    "microbundle": "^0.15.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.6.2",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "relay-compiler": "^14.0.0",
+    "relay-runtime": "^14.0.0",
+    "ts-jest": "^28.0.4",
+    "typescript": "^4.7.3",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.9.2"
+  },
+  "peerDependencies": {
+    "jotai": "*",
+    "react": ">=17.0.0",
+    "relay-runtime": ">=14.0.0"
+  }
+}
