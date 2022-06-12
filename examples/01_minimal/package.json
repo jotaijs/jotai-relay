@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "babel-plugin-relay": "latest",
     "jotai": "latest",
     "jotai-relay": "latest",
     "relay-runtime": "latest",

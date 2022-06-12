@@ -5,6 +5,7 @@
   "dependencies": {
     "@types/relay-runtime": "latest",
     "@types/react": "latest",
+    "babel-plugin-relay": "latest",
     "jotai": "latest",
     "jotai-relay": "latest",
     "relay-runtime": "latest",
