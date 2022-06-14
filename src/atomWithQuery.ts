@@ -24,10 +24,11 @@ export function atomWithQuery<T extends OperationType>(
 ) {
   type Response = T['response'];
   const queryResultAtom = atom((get) => {
-    const environment = options?.getEnvironment
-      ? options.getEnvironment(get)
-      : get(environmentAtom);
     const variables = getVariables(get);
+    const { getEnvironment, ...fetchQueryOptions } = options || {};
+    const environment = getEnvironment
+      ? getEnvironment(get)
+      : get(environmentAtom);
     let resolve: ((result: Response) => void) | null = null;
     const resultAtom = atom<Response | Promise<Response>>(
       new Promise<Response>((r) => {
@@ -49,6 +50,7 @@ export function atomWithQuery<T extends OperationType>(
       environment,
       taggedNode,
       variables,
+      fetchQueryOptions,
     ).subscribe({
       next: listener,
       // TODO error handling
@@ -64,12 +66,15 @@ export function atomWithQuery<T extends OperationType>(
       if (subscription) {
         clearTimeout(timer);
       } else {
-        subscription = fetchQuery(environment, taggedNode, variables).subscribe(
-          {
-            next: listener,
-            // TODO error handling
-          },
-        );
+        subscription = fetchQuery(
+          environment,
+          taggedNode,
+          variables,
+          fetchQueryOptions,
+        ).subscribe({
+          next: listener,
+          // TODO error handling
+        });
       }
       return () => subscription?.unsubscribe();
     };
