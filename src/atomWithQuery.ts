@@ -11,6 +11,12 @@ import { atom } from 'jotai';
 import type { Getter } from 'jotai';
 import { environmentAtom } from './environmentAtom';
 
+type Timeout = ReturnType<typeof setTimeout>;
+
+type AtomWithQueryAction = {
+  type: 'refetch';
+};
+
 type Options = {
   getEnvironment?: (get: Getter) => Environment;
   networkCacheConfig?: CacheConfig | null | undefined;
@@ -23,67 +29,107 @@ export function atomWithQuery<T extends OperationType>(
   options?: Options,
 ) {
   type Response = T['response'];
-  const queryResultAtom = atom((get) => {
-    const variables = getVariables(get);
-    const { getEnvironment, ...fetchQueryOptions } = options || {};
-    const environment = getEnvironment
-      ? getEnvironment(get)
-      : get(environmentAtom);
-    let resolve: ((result: Response) => void) | null = null;
-    const resultAtom = atom<Response | Promise<Response>>(
-      new Promise<Response>((r) => {
-        resolve = r;
-      }),
-    );
-    let setResult: (result: Response | Promise<Response>) => void = () => {
-      throw new Error('setting result without mount');
-    };
-    const listener = (result: Response) => {
-      if (resolve) {
-        resolve(result);
-        resolve = null;
-      } else {
-        setResult(result);
-      }
-    };
-    let subscription: Subscription | null = fetchQuery(
-      environment,
-      taggedNode,
-      variables,
-      fetchQueryOptions,
-    ).subscribe({
-      next: listener,
-      // TODO error handling
-    });
-    const timer = setTimeout(() => {
-      if (subscription) {
-        subscription.unsubscribe();
-        subscription = null;
-      }
-    }, 1000);
-    resultAtom.onMount = (update) => {
-      setResult = update;
-      if (subscription) {
-        clearTimeout(timer);
-      } else {
+  type Result = { response: Response } | { error: Error };
+  const queryResultAtom = atom(
+    (get) => {
+      const variables = getVariables(get);
+      const { getEnvironment, ...fetchQueryOptions } = options || {};
+      const environment = getEnvironment
+        ? getEnvironment(get)
+        : get(environmentAtom);
+      let resolve: ((result: Result) => void) | null = null;
+      const resultAtom = atom<Result | Promise<Result>>(
+        new Promise<Result>((r) => {
+          resolve = r;
+        }),
+      );
+      let setResult: ((result: Result) => void) | null = null;
+      const listener = (result: Result) => {
+        if (resolve) {
+          resolve(result);
+          resolve = null;
+        } else if (setResult) {
+          setResult(result);
+        } else {
+          throw new Error('setting result without mount');
+        }
+      };
+      let subscription: Subscription | null = null;
+      let timer: Timeout | null = null;
+      const startQuery = () => {
         subscription = fetchQuery(
           environment,
           taggedNode,
           variables,
           fetchQueryOptions,
         ).subscribe({
-          next: listener,
-          // TODO error handling
+          next: (response: Response) => listener({ response }),
+          error: (error: Error) => listener({ error }),
         });
+        if (!setResult) {
+          // not mounted yet
+          timer = setTimeout(() => {
+            if (subscription) {
+              subscription.unsubscribe();
+              subscription = null;
+            }
+          }, 1000);
+        }
+      };
+      startQuery();
+      resultAtom.onMount = (update) => {
+        setResult = update;
+        if (subscription) {
+          clearTimeout(timer as Timeout);
+        } else {
+          startQuery();
+        }
+        return () => subscription?.unsubscribe();
+      };
+      return {
+        resultAtom,
+        setResolve: (r: (result: Result) => void) => {
+          resolve = r;
+        },
+        refetch: () => {
+          if (subscription) {
+            clearTimeout(timer as Timeout);
+            subscription.unsubscribe();
+          }
+          startQuery();
+        },
+      };
+    },
+    (get, set, action: AtomWithQueryAction) => {
+      switch (action.type) {
+        case 'refetch': {
+          const { resultAtom, setResolve, refetch } = get(queryResultAtom);
+          set(
+            resultAtom,
+            new Promise<Result>((r) => {
+              setResolve(r);
+            }),
+          );
+          refetch();
+          return;
+        }
+        default: {
+          throw new Error(`Unknown action type: ${action.type}`);
+        }
       }
-      return () => subscription?.unsubscribe();
-    };
-    return { resultAtom };
-  });
-  const queryAtom = atom((get) => {
-    const queryResult = get(queryResultAtom);
-    const { resultAtom } = queryResult;
-    return get(resultAtom);
-  });
+    },
+  );
+  const queryAtom = atom(
+    (get) => {
+      const queryResult = get(queryResultAtom);
+      const { resultAtom } = queryResult;
+      const result = get(resultAtom);
+      if ('error' in result) {
+        throw result.error;
+      }
+      return result.response;
+    },
+    (_get, set, action: AtomWithQueryAction) => set(queryResultAtom, action), // delegate action
+  );
   return queryAtom;
 }
