@@ -91,7 +91,6 @@
   },
   "peerDependencies": {
     "jotai": "*",
-    "react": ">=17.0.0",
     "relay-runtime": ">=14.0.0"
   }
 }
