@@ -45,13 +45,15 @@ export function atomWithQuery<T extends OperationType>(
     );
     let setResult: ((result: Result) => void) | null = null;
     const listener = (result: Result) => {
+      if (!resolve && !setResult) {
+        throw new Error('setting result without mount');
+      }
       if (resolve) {
         resolve(result);
         resolve = null;
-      } else if (setResult) {
+      }
+      if (setResult) {
         setResult(result);
-      } else {
-        throw new Error('setting result without mount');
       }
     };
     let subscription: Subscription | null = null;
@@ -88,7 +90,13 @@ export function atomWithQuery<T extends OperationType>(
       } else {
         startQuery();
       }
-      return () => subscription?.unsubscribe();
+      return () => {
+        setResult = null;
+        if (subscription) {
+          subscription.unsubscribe();
+          subscription = null;
+        }
+      };
     };
     return { resultAtom, setResolve, startQuery };
   });
