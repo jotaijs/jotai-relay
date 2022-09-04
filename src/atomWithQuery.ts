@@ -114,12 +114,7 @@ export function atomWithQuery<T extends OperationType>(
       switch (action.type) {
         case 'refetch': {
           const { resultAtom, setResolve, startQuery } = get(queryResultAtom);
-          set(
-            resultAtom,
-            new Promise<Result>((r) => {
-              setResolve(r);
-            }),
-          );
+          set(resultAtom, new Promise<Result>(setResolve));
           startQuery();
           return;
         }
