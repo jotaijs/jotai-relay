@@ -37,12 +37,11 @@ export function atomWithQuery<T extends OperationType>(
       ? getEnvironment(get)
       : get(environmentAtom);
     let resolve: ((result: Result) => void) | null = null;
-    const setResolve = (r: (result: Result) => void) => {
-      resolve = r;
-    };
-    const resultAtom = atom<Result | Promise<Result>>(
-      new Promise<Result>(setResolve),
-    );
+    const makePending = () =>
+      new Promise<Result>((r) => {
+        resolve = r;
+      });
+    const resultAtom = atom<Result | Promise<Result>>(makePending());
     let setResult: ((result: Result) => void) | null = null;
     const listener = (result: Result) => {
       if (!resolve && !setResult) {
@@ -98,7 +97,7 @@ export function atomWithQuery<T extends OperationType>(
         }
       };
     };
-    return { resultAtom, setResolve, startQuery };
+    return { resultAtom, makePending, startQuery };
   });
   const queryAtom = atom(
     (get) => {
@@ -113,8 +112,8 @@ export function atomWithQuery<T extends OperationType>(
     (get, set, action: AtomWithQueryAction) => {
       switch (action.type) {
         case 'refetch': {
-          const { resultAtom, setResolve, startQuery } = get(queryResultAtom);
-          set(resultAtom, new Promise<Result>(setResolve));
+          const { resultAtom, makePending, startQuery } = get(queryResultAtom);
+          set(resultAtom, makePending());
           startQuery();
           return;
         }
