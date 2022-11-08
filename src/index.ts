@@ -1,2 +1,2 @@
 export { environmentAtom } from './environmentAtom';
-export { atomWithQuery } from './atomWithQuery';
+export { atomsWithQuery } from './atomsWithQuery';
