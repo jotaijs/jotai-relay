@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { Provider, useAtom } from 'jotai';
-import { environmentAtom, atomWithQuery } from 'jotai-relay';
+import { environmentAtom, atomsWithQuery } from 'jotai-relay';
 import { Environment, Network, RecordSource, Store } from 'relay-runtime';
 import graphql from 'babel-plugin-relay/macro';
 
@@ -21,7 +21,7 @@ const myEnvironment = new Environment({
   store: new Store(new RecordSource()),
 });
 
-const countriesAtom = atomWithQuery(
+const [countriesAtom] = atomsWithQuery(
   graphql`
     query AppCountriesQuery {
       countries {

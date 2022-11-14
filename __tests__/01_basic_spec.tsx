@@ -1,8 +1,15 @@
-import { environmentAtom, atomWithQuery } from '../src/index';
+import {
+  environmentAtom,
+  atomsWithQuery,
+  atomsWithMutation,
+  atomsWithSubscription,
+} from '../src/index';
 
 describe('basic spec', () => {
   it('should export functions', () => {
     expect(environmentAtom).toBeDefined();
-    expect(atomWithQuery).toBeDefined();
+    expect(atomsWithQuery).toBeDefined();
+    expect(atomsWithMutation).toBeDefined();
+    expect(atomsWithSubscription).toBeDefined();
   });
 });

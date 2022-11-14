@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { Provider, atom, useAtom, useSetAtom } from 'jotai';
-import { environmentAtom, atomWithQuery } from 'jotai-relay';
+import { environmentAtom, atomsWithQuery } from 'jotai-relay';
 import { Environment, Network, RecordSource, Store } from 'relay-runtime';
 // eslint-disable-next-line
 // @ts-ignore
@@ -31,7 +31,7 @@ const myEnvironment = new Environment({
 
 const filterAtom = atom<CountryFilterInput | null>({});
 
-const countriesAtom = atomWithQuery<AppCountriesQuery>(
+const [countriesAtom] = atomsWithQuery<AppCountriesQuery>(
   graphql`
     query AppCountriesQuery($filter: CountryFilterInput) {
       countries(filter: $filter) {
