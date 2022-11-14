@@ -1,5 +1,4 @@
-import type { Environment } from 'relay-runtime';
-import type { RelayObservable } from 'relay-runtime/lib/network/RelayObservable';
+import type { Environment, Subscribable } from 'relay-runtime';
 import { atom } from 'jotai';
 import type { Getter } from 'jotai';
 import { atomWithObservable } from 'jotai/utils';
@@ -12,7 +11,7 @@ export const createAtoms = <
 >(
   getArgs: (get: Getter) => Args,
   getEnvironment: (get: Getter) => Environment,
-  execute: (environment: Environment, args: Args) => RelayObservable<Result>,
+  execute: (environment: Environment, args: Args) => Subscribable<Result>,
   handleAction: (
     action: Action,
     environment: Environment,

@@ -1,8 +1,6 @@
 import { fetchQuery } from 'relay-runtime';
 import type {
-  CacheConfig,
   Environment,
-  FetchQueryFetchPolicy,
   GraphQLTaggedNode,
   OperationType,
 } from 'relay-runtime';
@@ -10,10 +8,7 @@ import type { Getter, WritableAtom } from 'jotai';
 import { environmentAtom } from './environmentAtom';
 import { createAtoms } from './common';
 
-type Config = {
-  networkCacheConfig?: CacheConfig;
-  fetchPolicy?: FetchQueryFetchPolicy;
-};
+type Config = Parameters<typeof fetchQuery>[3];
 
 type Action = {
   type: 'refetch';
