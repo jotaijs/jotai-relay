@@ -1,4 +1,4 @@
 export { environmentAtom } from './environmentAtom';
-export { atomsWithQuery } from './atomsWithQuery';
-export { atomsWithMutation } from './atomsWithMutation';
-export { atomsWithSubscription } from './atomsWithSubscription';
+export { atomWithQuery } from './atomWithQuery';
+export { atomWithMutation } from './atomWithMutation';
+export { atomWithSubscription } from './atomWithSubscription';

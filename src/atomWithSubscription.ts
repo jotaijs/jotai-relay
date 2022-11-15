@@ -8,7 +8,7 @@ import type {
 } from 'relay-runtime';
 import type { Getter, WritableAtom } from 'jotai';
 import { environmentAtom } from './environmentAtom';
-import { createAtoms } from './common';
+import { createAtom } from './common';
 
 type Configs = Parameters<typeof requestSubscription>[1]['configs'];
 
@@ -16,17 +16,14 @@ type Action = {
   type: 'refetch';
 };
 
-export function atomsWithSubscription<T extends OperationType>(
+export function atomWithSubscription<T extends OperationType>(
   taggedNode: GraphQLTaggedNode,
   getVariables: (get: Getter) => T['variables'],
   getConfigs?: (get: Getter) => Configs,
   updater?: SelectorStoreUpdater<T['response']>,
   getEnvironment: (get: Getter) => Environment = (get) => get(environmentAtom),
-): readonly [
-  dataAtom: WritableAtom<T['response'], Action>,
-  statusAtom: WritableAtom<T['response'] | undefined, Action>,
-] {
-  return createAtoms(
+): WritableAtom<T['response'], Action> {
+  return createAtom(
     (get) => ({
       configs: getConfigs?.(get),
       subscription: taggedNode,
