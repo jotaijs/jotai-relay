@@ -3,7 +3,7 @@ import { atom } from 'jotai';
 import type { Getter } from 'jotai';
 import { atomWithObservable } from 'jotai/utils';
 
-export const createAtoms = <
+export const createAtom = <
   Args,
   Result,
   Action,
@@ -28,28 +28,6 @@ export const createAtoms = <
     return observable;
   });
 
-  const baseStatusAtom = atom((get) => {
-    const observable = get(observableAtom);
-    const resultAtom = atomWithObservable(() => observable, {
-      initialValue: undefined,
-    });
-    return resultAtom;
-  });
-
-  const statusAtom = atom(
-    (get) => {
-      const resultAtom = get(baseStatusAtom);
-      return get(resultAtom);
-    },
-    (get, set, action: Action) => {
-      const environment = getEnvironment(get);
-      const refresh = () => {
-        set(refreshAtom, (c) => c + 1);
-      };
-      return handleAction(action, environment, refresh);
-    },
-  );
-
   const baseDataAtom = atom((get) => {
     const observable = get(observableAtom);
     const resultAtom = atomWithObservable(() => observable);
@@ -62,8 +40,14 @@ export const createAtoms = <
       const result = get(resultAtom);
       return result;
     },
-    (_get, set, action: Action) => set(statusAtom, action),
+    (get, set, action: Action) => {
+      const environment = getEnvironment(get);
+      const refresh = () => {
+        set(refreshAtom, (c) => c + 1);
+      };
+      return handleAction(action, environment, refresh);
+    },
   );
 
-  return [dataAtom, statusAtom] as const;
+  return dataAtom;
 };

@@ -8,12 +8,9 @@ import { atom } from 'jotai';
 import type { Getter, WritableAtom } from 'jotai';
 import { environmentAtom } from './environmentAtom';
 
-export function atomsWithMutation<T extends MutationParameters>(
+export function atomWithMutation<T extends MutationParameters>(
   getEnvironment: (get: Getter) => Environment = (get) => get(environmentAtom),
-): readonly [
-  dataAtom: WritableAtom<undefined, MutationConfig<T>>,
-  statusAtom: WritableAtom<undefined, MutationConfig<T>>,
-] {
+): WritableAtom<undefined, MutationConfig<T>> {
   const mutationAtom = atom(
     // Don't we have any valid value for this atom??
     undefined,
@@ -23,6 +20,5 @@ export function atomsWithMutation<T extends MutationParameters>(
       commitMutation(environment, config);
     },
   );
-  // A little unfortunate to return the same atom
-  return [mutationAtom, mutationAtom] as const;
+  return mutationAtom;
 }
