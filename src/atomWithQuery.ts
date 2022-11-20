@@ -4,7 +4,7 @@ import type {
   GraphQLTaggedNode,
   OperationType,
 } from 'relay-runtime';
-import type { Getter, WritableAtom } from 'jotai';
+import type { Getter, WritableAtom } from 'jotai/vanilla';
 import { environmentAtom } from './environmentAtom';
 import { createAtom } from './common';
 
@@ -19,7 +19,7 @@ export function atomWithQuery<T extends OperationType>(
   getVariables: (get: Getter) => T['variables'],
   getConfig?: (get: Getter) => Config,
   getEnvironment: (get: Getter) => Environment = (get) => get(environmentAtom),
-): WritableAtom<T['response'], Action> {
+): WritableAtom<T['response'], [Action], void> {
   return createAtom(
     (get) => [taggedNode, getVariables(get), getConfig?.(get)] as const,
     getEnvironment,

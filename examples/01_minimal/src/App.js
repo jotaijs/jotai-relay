@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
-import { Provider, useAtom } from 'jotai';
+import { Provider, useAtom } from 'jotai/react';
+import { createStore } from 'jotai/vanilla';
 import { environmentAtom, atomWithQuery } from 'jotai-relay';
 import { Environment, Network, RecordSource, Store } from 'relay-runtime';
 import graphql from 'babel-plugin-relay/macro';
@@ -43,9 +44,12 @@ const Main = () => {
   );
 };
 
+const store = createStore();
+store.set(environmentAtom, myEnvironment);
+
 const App = () => {
   return (
-    <Provider initialValues={[[environmentAtom, myEnvironment]]}>
+    <Provider store={store}>
       <Suspense fallback="Loading...">
         <Main />
       </Suspense>

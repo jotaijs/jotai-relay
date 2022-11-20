@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { Provider, atom, useAtom, useSetAtom } from 'jotai';
+import { Provider, useAtom, useSetAtom } from 'jotai/react';
+import { atom, createStore } from 'jotai/vanilla';
 import { environmentAtom, atomWithQuery } from 'jotai-relay';
 import { Environment, Network, RecordSource, Store } from 'relay-runtime';
 // eslint-disable-next-line
@@ -81,9 +82,12 @@ const Fallback = ({ error, resetErrorBoundary }: FallbackProps) => {
   );
 };
 
+const store = createStore();
+store.set(environmentAtom, myEnvironment);
+
 const App = () => {
   return (
-    <Provider initialValues={[[environmentAtom, myEnvironment]]}>
+    <Provider store={store}>
       <ErrorBoundary FallbackComponent={Fallback}>
         <Suspense fallback="Loading...">
           <Main />
