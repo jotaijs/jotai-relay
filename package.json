@@ -1,11 +1,11 @@
 {
   "name": "jotai-relay",
   "description": "👻🧲",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": "Daishi Kato",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jotai-labs/jotai-relay.git"
+    "url": "https://github.com/jotaijs/jotai-relay.git"
   },
   "source": "./src/index.ts",
   "main": "./dist/index.umd.js",
