@@ -1,14 +1,9 @@
 import type { Environment, Subscribable } from 'relay-runtime';
-import { atom } from 'jotai';
-import type { Getter } from 'jotai';
-import { atomWithObservable } from 'jotai/utils';
+import { atom } from 'jotai/vanilla';
+import type { Getter } from 'jotai/vanilla';
+import { atomWithObservable } from 'jotai/vanilla/utils';
 
-export const createAtom = <
-  Args,
-  Result,
-  Action,
-  ActionResult extends Promise<void> | void,
->(
+export const createAtom = <Args, Result, Action, ActionResult>(
   getArgs: (get: Getter) => Args,
   getEnvironment: (get: Getter) => Environment,
   execute: (environment: Environment, args: Args) => Subscribable<Result>,

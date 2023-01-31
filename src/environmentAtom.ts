@@ -1,5 +1,5 @@
 import { Environment, Network, RecordSource, Store } from 'relay-runtime';
-import { atom } from 'jotai';
+import { atom } from 'jotai/vanilla';
 
 const DEFAULT_URL =
   (() => {

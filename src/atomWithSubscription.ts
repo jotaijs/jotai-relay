@@ -6,7 +6,7 @@ import type {
   SelectorStoreUpdater,
   Subscribable,
 } from 'relay-runtime';
-import type { Getter, WritableAtom } from 'jotai';
+import type { Getter, WritableAtom } from 'jotai/vanilla';
 import { environmentAtom } from './environmentAtom';
 import { createAtom } from './common';
 
@@ -22,7 +22,7 @@ export function atomWithSubscription<T extends OperationType>(
   getConfigs?: (get: Getter) => Configs,
   updater?: SelectorStoreUpdater<T['response']>,
   getEnvironment: (get: Getter) => Environment = (get) => get(environmentAtom),
-): WritableAtom<T['response'], Action> {
+): WritableAtom<T['response'], [Action], void> {
   return createAtom(
     (get) => ({
       configs: getConfigs?.(get),
