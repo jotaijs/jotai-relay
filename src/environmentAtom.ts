@@ -28,3 +28,7 @@ const defaultEnvironment = new Environment({
 });
 
 export const environmentAtom = atom(defaultEnvironment);
+
+if (process.env.NODE_ENV !== 'production') {
+  environmentAtom.debugPrivate = true;
+}

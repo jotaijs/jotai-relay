@@ -14,7 +14,9 @@ export const createAtom = <Args, Result, Action, ActionResult>(
   ) => ActionResult,
 ) => {
   const refreshAtom = atom(0);
-
+  if (process.env.NODE_ENV !== 'production') {
+    refreshAtom.debugPrivate = true;
+  }
   const observableAtom = atom((get) => {
     get(refreshAtom);
     const args = getArgs(get);
@@ -23,11 +25,19 @@ export const createAtom = <Args, Result, Action, ActionResult>(
     return observable;
   });
 
+  if (process.env.NODE_ENV !== 'production') {
+    observableAtom.debugPrivate = true;
+  }
+
   const baseDataAtom = atom((get) => {
     const observable = get(observableAtom);
     const resultAtom = atomWithObservable(() => observable);
     return resultAtom;
   });
+
+  if (process.env.NODE_ENV !== 'production') {
+    baseDataAtom.debugPrivate = true;
+  }
 
   const dataAtom = atom(
     (get) => {
